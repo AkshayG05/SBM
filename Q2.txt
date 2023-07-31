@@ -1,0 +1,51 @@
+Step 1: Identify the Physical Volumes
+First, ensure you have two physical volumes available for use. You can check them using the following command:
+
+
+#sudo fdisk -l
+This will list the available disks and partitions on your system. Identify the two physical volumes you want to use for creating the volume group.
+
+Step 2: Create the Volume Group
+We'll create a volume group named "my_vg" using the two identified physical volumes (replace /dev/sdX1 and /dev/sdY1 with the correct names of your physical volumes).
+
+
+#sudo vgcreate my_vg /dev/sdX1 /dev/sdY1
+Step 3: Create Logical Volumes
+Now, we'll create three logical volumes within the "my_vg" volume group. Let's name them "data_lv," "scratch_lv," and "app_lv."
+
+
+#sudo lvcreate -n data_lv -L 10G my_vg
+#sudo lvcreate -n scratch_lv -L 20G my_vg
+#sudo lvcreate -n app_lv -L 15G my_vg
+This creates three logical volumes: data_lv with 10GB size, scratch_lv with 20GB size, and app_lv with 15GB size. You can adjust the sizes according to your requirements.
+
+Step 4: Format the Logical Volumes with Ext4
+Next, we'll format the logical volumes with the ext4 filesystem.
+
+
+#sudo mkfs.ext4 /dev/my_vg/data_lv
+#sudo mkfs.ext4 /dev/my_vg/scratch_lv
+#sudo mkfs.ext4 /dev/my_vg/app_lv
+Step 5: Mount the Logical Volumes
+Now, we'll create mount points for the logical volumes and mount them at the specified paths.
+
+
+#sudo mkdir /data /scratch /app
+#sudo mount /dev/my_vg/data_lv /data
+#sudo mount /dev/my_vg/scratch_lv /scratch
+#sudo mount /dev/my_vg/app_lv /app
+Step 6: Update /etc/fstab for Automatic Mounting (optional)
+To make sure the logical volumes are automatically mounted upon system boot, add the following lines to the "/etc/fstab" file.
+
+
+#/dev/my_vg/data_lv   /data   ext4   defaults   0   2
+#/dev/my_vg/scratch_lv   /scratch   ext4   defaults   0   2
+#/dev/my_vg/app_lv   /app   ext4   defaults   0   2
+Step 7: Verify Mounting
+You can verify that the logical volumes are mounted correctly by running:
+
+
+#df -h
+This will show you the mounted filesystems and their respective mount points.
+
+That's it! You now have a volume group with three logical volumes mounted as /data, /scratch, and /app, each formatted with the ext4 filesystem.
